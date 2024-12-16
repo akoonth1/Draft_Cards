@@ -14,7 +14,7 @@ import { useSortable } from "@dnd-kit/sortable";
     
     return (
         <>
-        <h1>Card</h1>
+       
         <h3>{id}</h3>
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
         {children}

@@ -43,6 +43,11 @@ export default function Board() {
     },
   ]);
 
+  const [activeId, setActiveId] = useState(null);
+  const [activeCard, setActiveCard] = useState(null);
+
+
+
   // Initialize sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -63,72 +68,48 @@ export default function Board() {
       );
     };
     
-    const handleDragEnd = (event) => {
-      const { active, over } = event;
-      if (!over) return;
-    
-      const activeId = String(active.id);
-      const overId = String(over.id);
-      const activeColumn = findColumn(activeId);
-      const overColumn = findColumn(overId);
-    
-      if (!activeColumn || !overColumn) return;
-    
-      const activeIndex = activeColumn.cards.findIndex((i) => i.id === activeId);
-      const overIndex = overColumn.cards.findIndex((i) => i.id === overId);
+
+        const handleDragStart = (event) => {
+      const { active } = event;
+      setActiveId(active.id);
       
-      const newIndex = overIndex >= 0 ? overIndex : overColumn.cards.length;
-    
-      setColumns((prevState) => 
-        prevState.map((column) => {
-          if (column.id === activeColumn.id) {
-            return {
-              ...column,
-              cards: column.cards.filter((card) => card.id !== activeId)
-            };
-          }
-          
-          if (column.id === overColumn.id) {
-            const newCards = [...column.cards];
-            newCards.splice(newIndex, 0, activeColumn.cards[activeIndex]);
-            return { ...column, cards: newCards };
-          }
-          
-          return column;
-        })
-      );
+      const activeColumn = findColumn(active.id);
+      if (activeColumn) {
+        const card = activeColumn.cards.find(card => card.id === active.id);
+        setActiveCard(card);
+      }
     };
     
     const handleDragOver = (event) => {
       const { active, over } = event;
       if (!over) return;
     
-      const activeId = String(active.id);
-      const overId = String(over.id);
+      const activeId = active.id;
+      const overId = over.id;
+      
       const activeColumn = findColumn(activeId);
       const overColumn = findColumn(overId);
     
       if (!activeColumn || !overColumn || activeColumn === overColumn) return;
     
-      setColumns((prevState) => {
-        const activeItems = [...activeColumn.cards];
-        const overItems = [...overColumn.cards];
-        const activeIndex = activeItems.findIndex((i) => i.id === activeId);
-        const overIndex = overItems.findIndex((i) => i.id === overId);
+      setColumns((prevColumns) => {
+        const activeCardIndex = activeColumn.cards.findIndex(card => card.id === activeId);
+        const activeCard = activeColumn.cards[activeCardIndex];
         
-        const newIndex = overIndex >= 0 ? overIndex : overItems.length;
-    
-        return prevState.map((column) => {
+        return prevColumns.map(column => {
+          // Remove from source column
           if (column.id === activeColumn.id) {
-            return {
-              ...column,
-              cards: activeItems.filter((i) => i.id !== activeId)
-            };
+            const newCards = [...column.cards];
+            newCards.splice(activeCardIndex, 1);
+            return { ...column, cards: newCards };
           }
           
+          // Add to target column
           if (column.id === overColumn.id) {
-            const newCards = [...overItems];
-            newCards.splice(newIndex, 0, activeItems[activeIndex]);
+            const overIndex = column.cards.findIndex(card => card.id === overId);
+            const insertIndex = overIndex >= 0 ? overIndex : column.cards.length;
+            const newCards = [...column.cards];
+            newCards.splice(insertIndex, 0, activeCard);
             return { ...column, cards: newCards };
           }
           
@@ -136,30 +117,73 @@ export default function Board() {
         });
       });
     };
-
-
     
-    return (
-      <div>
-        <h1>Board</h1>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragEnd={handleDragEnd}
-          onDragOver={handleDragOver}
-        >
-          <div style={{ display: "flex" }}>
-            {columns.map((column) => (
-              <Column 
-                key={column.id} 
-                id={column.id} 
-                title={`Column ${column.id}`}
-                cards={column.cards}
-              />
-            ))}
-          </div>
-        </DndContext>
-      </div>
-    );
+    const handleDragEnd = (event) => {
+      const { active, over } = event;
+      setActiveId(null);
+      setActiveCard(null);
+      
+      if (!over) return;
+    
+      const activeId = active.id;
+      const overId = over.id;
+      
+      const activeColumn = findColumn(activeId);
+      const overColumn = findColumn(overId);
+    
+      if (!activeColumn || !overColumn) return;
+    
+      if (activeColumn === overColumn) {
+        // Same column - just reorder
+        const oldIndex = activeColumn.cards.findIndex(card => card.id === activeId);
+        const newIndex = overColumn.cards.findIndex(card => card.id === overId);
+        
+        setColumns(prevColumns => 
+          prevColumns.map(column => {
+            if (column.id === activeColumn.id) {
+              const newCards = [...column.cards];
+              const [movedCard] = newCards.splice(oldIndex, 1);
+              newCards.splice(newIndex, 0, movedCard);
+              return { ...column, cards: newCards };
+            }
+            return column;
+          })
+        );
+      }
+    };
+    
+      return (
+        <div>
+          <h1>Board</h1>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+          >
+            <div style={{ display: "flex" }}>
+              {columns.map((column) => (
+                <Column 
+                  key={column.id} 
+                  id={column.id} 
+                  title={`Column ${column.id}`}
+                  cards={column.cards}
+                />
+              ))}
+            </div>
+            
+            <DragOverlay>
+              {activeId && activeCard ? (
+                <Card 
+                  id={activeId}
+                  {...activeCard}
+                  isDragging={true}
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
+      );
 
 }
