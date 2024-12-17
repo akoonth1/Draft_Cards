@@ -16,12 +16,27 @@ function Card({ id, title, points = 0, onPointsChange, isDragging, removeCard })
     transition,
     padding: 16,
     margin: "0 0 8px 0",
-    backgroundColor: isDragging ? "#e1e1e1" : "white",
+    backgroundColor: isDragging ? "#e1e1e1" : "#f9f9f9", // Light background for better visibility
+    backgroundImage: `url('https://via.placeholder.com/400x200.png?text=Card+Background')`, // Placeholder image
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
     border: "1px solid #ccc",
     borderRadius: "4px",
-    cursor: "default", // Changed to default to avoid conflicting with drag handle
+    cursor: "default",
     opacity: isDragging ? 0.5 : 1,
     touchAction: "none",
+    color: '#fff', // Ensure text is readable over the background image
+    position: 'relative',
+  };
+
+  const overlayStyle = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay for text readability
+    borderRadius: "4px",
   };
 
   const handlePointsChangeLocal = (newPoints) => {
@@ -32,15 +47,41 @@ function Card({ id, title, points = 0, onPointsChange, isDragging, removeCard })
     removeCard(id);
   };
 
+  // Handler to disable spacebar on drag handle
+  const handleKeyDown = (e) => {
+    if (e.key === ' ') {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div 
       ref={setNodeRef} 
       style={style} 
       {...attributes}
-      // Removed {...listeners} from the main div
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={overlayStyle}></div> {/* Overlay for better text visibility */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
         
+        {/* Enhanced Drag Handle */}
+        <div 
+          {...listeners} 
+          style={{
+            cursor: 'grab',
+            paddingTop: '8px',
+            textAlign: 'right',
+            userSelect: 'none',
+            fontSize: '20px',
+            color: '#fff',
+          }}
+          onClick={(e) => e.stopPropagation()} 
+          aria-label="Drag Handle"
+          onKeyDown={handleKeyDown} // Disable spacebar
+          tabIndex={0} // Make the drag handle focusable
+        >
+          &#x2630; {/* Hamburger Icon */}
+     
+
         {/* Title Section */}
         <div
           style={{ 
@@ -55,21 +96,6 @@ function Card({ id, title, points = 0, onPointsChange, isDragging, removeCard })
           }}
         >
           {title || 'Untitled'}
-                  {/* Remove Button */}
-        <button 
-          onClick={handleRemove}
-          style={{
-            padding: '4px 8px',
-            backgroundColor: 'white',
-            color: 'gray',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            alignSelf: 'flex-end',
-          }}
-        >
-          X
-        </button>
         </div>
         
         {/* FormInfo Section (Handles Points) */}
@@ -78,23 +104,21 @@ function Card({ id, title, points = 0, onPointsChange, isDragging, removeCard })
           onPointsChange={handlePointsChangeLocal}
         />
 
-
-
-        {/* Enhanced Drag Handle */}
-        <div 
-          {...listeners} 
+        {/* Remove Button */}
+        <button 
+          onClick={handleRemove}
           style={{
-            cursor: 'grab',
-            paddingTop: '8px',
-            textAlign: 'right',
-            userSelect: 'none',
-            fontSize: '20px', // Increased size for better touch support
-            color: '#555', // Improved visibility
+            padding: '4px 8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            color: 'gray',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            alignSelf: 'flex-end',
           }}
-          onClick={(e) => e.stopPropagation()} 
-          aria-label="Drag Handle"
         >
-          &#x2630; {/* Hamburger Icon */}
+          Remove
+        </button>
         </div>
       </div>
     </div>
