@@ -6,12 +6,15 @@ import './App.css'
 import FormInfo from './components/FormInfo'
 import { useDroppable } from '@dnd-kit/core'
 import GrabImage from './components/GrabImage'
+import { CardProvider } from './components/CardContext'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
+      <CardProvider>
+
       <Board />
       <div>
         <FormInfo />
@@ -19,6 +22,7 @@ function App() {
       <div>
         <GrabImage />
        </div>
+      </CardProvider>
     </>
   )
 }
