@@ -2,7 +2,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import FormInfo from "./FormInfo";
 
-function Card({ id, title, points = 0, onPointsChange, isDragging }) {
+function Card({ id, title, points = 0, onPointsChange, isDragging, removeCard }) {
   const { 
     attributes, 
     listeners, 
@@ -27,6 +27,10 @@ function Card({ id, title, points = 0, onPointsChange, isDragging }) {
   // Wrapper to include card ID when points change
   const handlePointsChangeLocal = (newPoints) => {
     onPointsChange?.(id, newPoints);
+  };
+
+  const handleRemove = () => {
+    removeCard(id);
   };
 
   return (
@@ -59,6 +63,22 @@ function Card({ id, title, points = 0, onPointsChange, isDragging }) {
           points={points}
           onPointsChange={handlePointsChangeLocal}
         />
+
+        {/* Remove Button */}
+        <button 
+          onClick={handleRemove}
+          style={{
+            padding: '4px 8px',
+            backgroundColor: '#f44336',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            alignSelf: 'flex-end',
+          }}
+        >
+          Remove
+        </button>
 
         {/* Drag Handle */}
         <div 

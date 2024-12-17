@@ -71,7 +71,7 @@ export default function Board() {
     setColumnCount(columnCount + 1);
   };
 
-  const addCardToFirstColumn = () => {
+  const addCard = (columnId) => {
     const newCardId = `card-${cardCount}`;
     const newCard = {
       id: newCardId,
@@ -80,12 +80,32 @@ export default function Board() {
     };
     setColumns(prevColumns =>
       prevColumns.map(column =>
-        column.id === 'column-1'
+        column.id === columnId
           ? { ...column, cards: [...column.cards, newCard] }
           : column
       )
     );
     setCardCount(cardCount + 1);
+  };
+
+  const handleRemoveCard = (cardId) => {
+    setColumns(prevColumns =>
+      prevColumns.map(column => ({
+        ...column,
+        cards: column.cards.filter(card => card.id !== cardId)
+      }))
+    );
+  };
+
+  const handleRemoveColumn = (columnId) => {
+    const column = columns.find(col => col.id === columnId);
+    if (column.cards.length > 0) {
+      alert("Cannot remove a column that is not empty.");
+      return;
+    }
+    setColumns(prevColumns =>
+      prevColumns.filter(column => column.id !== columnId)
+    );
   };
 
   const handlePointsChange = (cardId, newPoints) => {
@@ -211,7 +231,10 @@ export default function Board() {
         <button onClick={addColumn} style={{ padding: '8px 16px' }}>
           Add Column
         </button>
-        <button onClick={addCardToFirstColumn} style={{ padding: '8px 16px' }}>
+        <button 
+          onClick={() => addCard('column-1')} 
+          style={{ padding: '8px 16px' }}
+        >
           Add Card to "To Do"
         </button>
       </div>
@@ -234,6 +257,9 @@ export default function Board() {
               }))}
               onPointsChange={handlePointsChange}
               onTitleChange={handleColumnTitleChange}
+              addCard={addCard}
+              removeCard={handleRemoveCard}
+              removeColumn={handleRemoveColumn} // Pass removeColumn handler
             />
           ))}
         </div>
@@ -245,6 +271,7 @@ export default function Board() {
               points={activeCard?.points || 0}
               isDragging={true}
               onPointsChange={handlePointsChange}
+              removeCard={handleRemoveCard} // Optional: Pass if needed
             />
           ) : null}
         </DragOverlay>

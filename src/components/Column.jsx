@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
 
-function Column({ id, title, cards, onPointsChange, onTitleChange }) {
+function Column({ id, title, cards, onPointsChange, onTitleChange, addCard, removeCard, removeColumn }) {
   const { setNodeRef, isOver } = useDroppable({
     id,
     data: {
@@ -48,6 +48,18 @@ function Column({ id, title, cards, onPointsChange, onTitleChange }) {
   const handleTitleCancel = () => {
     setTempTitle(title);
     setIsEditing(false);
+  };
+
+  const handleAddCard = () => {
+    addCard(id);
+  };
+
+  const handleRemoveColumn = () => {
+    if (cards.length > 0) {
+      alert("Cannot remove a column that is not empty.");
+      return;
+    }
+    removeColumn(id);
   };
 
   return (
@@ -119,9 +131,33 @@ function Column({ id, title, cards, onPointsChange, onTitleChange }) {
               points={card.points}
               isDragging={card.isDragging}
               onPointsChange={onPointsChange}
+              removeCard={removeCard} // Pass removeCard handler
             />
           ))}
         </SortableContext>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px' }}>
+        <button 
+          onClick={handleAddCard} 
+          style={{ padding: '6px 12px', cursor: 'pointer' }}
+        >
+          Add Card
+        </button>
+        {cards.length === 0 && (
+          <button 
+            onClick={handleRemoveColumn} 
+            style={{ 
+              padding: '6px 12px', 
+              cursor: 'pointer', 
+              backgroundColor: '#f44336',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+            }}
+          >
+            Remove Column
+          </button>
+        )}
       </div>
     </div>
   );
