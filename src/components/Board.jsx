@@ -12,6 +12,8 @@ import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Column from "./Column";
 import Card from "./Card";
 import { useState } from "react";
+import { CSS } from "@dnd-kit/utilities";
+import GrabImage from './GrabImage';
 
 export default function Board() {
   const [columns, setColumns] = useState([

@@ -4,6 +4,8 @@ import viteLogo from '/vite.svg'
 import Board from './components/Board'
 import './App.css'
 import FormInfo from './components/FormInfo'
+import { useDroppable } from '@dnd-kit/core'
+import GrabImage from './components/GrabImage'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -15,6 +17,7 @@ function App() {
         <FormInfo />
       </div>
       <div>
+        <GrabImage />
        </div>
     </>
   )

@@ -98,7 +98,7 @@ export default {
           "Bartolomeo",
           "Cavendish",
           "Sai",
-          "Leo",
+        //   "Leo",
           "Rebecca",
           "Kyros",
           "Rayleigh, Silvers"
