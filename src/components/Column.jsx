@@ -1,3 +1,4 @@
+// Column.jsx
 import { useState } from 'react';
 import Card from "./Card";
 import { CSS } from "@dnd-kit/utilities";
@@ -117,11 +118,8 @@ function Column({ id, title, cards, onPointsChange, onTitleChange }) {
               title={card.title}
               points={card.points}
               isDragging={card.isDragging}
-              columnId={id}
               onPointsChange={onPointsChange}
-            >
-              {card.title || card.id}
-            </Card>
+            />
           ))}
         </SortableContext>
       </div>

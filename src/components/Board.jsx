@@ -1,3 +1,4 @@
+// Board.jsx
 import {
   closestCenter,
   DndContext,
@@ -46,6 +47,7 @@ export default function Board() {
   const [activeId, setActiveId] = useState(null);
   const [activeCard, setActiveCard] = useState(null);
   const [columnCount, setColumnCount] = useState(4); // Starting from 4 since 3 columns exist
+  const [cardCount, setCardCount] = useState(10); // Starting from 10 since 9 cards exist
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -69,13 +71,47 @@ export default function Board() {
     setColumnCount(columnCount + 1);
   };
 
-  const findColumn = (id) => {
-    const column = columns.find((column) => column.id === id);
-    if (column) return column;
-    return columns.find((column) =>
-      column.cards.some((card) => card.id === id)
+  const addCardToFirstColumn = () => {
+    const newCardId = `card-${cardCount}`;
+    const newCard = {
+      id: newCardId,
+      title: `Card ${cardCount}`,
+      points: 0,
+    };
+    setColumns(prevColumns =>
+      prevColumns.map(column =>
+        column.id === 'column-1'
+          ? { ...column, cards: [...column.cards, newCard] }
+          : column
+      )
+    );
+    setCardCount(cardCount + 1);
+  };
+
+  const handlePointsChange = (cardId, newPoints) => {
+    setColumns(prevColumns => 
+      prevColumns.map(column => ({
+        ...column,
+        cards: column.cards.map(card => 
+          card.id === cardId 
+            ? { ...card, points: newPoints }
+            : card
+        )
+      }))
     );
   };
+
+  const handleColumnTitleChange = (columnId, newTitle) => {
+    setColumns(prevColumns =>
+      prevColumns.map(column =>
+        column.id === columnId
+          ? { ...column, title: newTitle }
+          : column
+      )
+    );
+  };
+
+  // Drag handlers (handleDragStart, handleDragOver, handleDragEnd) remain unchanged
 
   const handleDragStart = (event) => {
     const { active } = event;
@@ -160,48 +196,25 @@ export default function Board() {
     }
   };
 
-  const handlePointsChange = (cardId, newPoints) => {
-    setColumns(prevColumns => 
-      prevColumns.map(column => ({
-        ...column,
-        cards: column.cards.map(card => 
-          card.id === cardId 
-            ? { ...card, points: newPoints }
-            : card
-        )
-      }))
-    );
-  };
-
-  const handleTitleChange = (cardId, newTitle) => {
-    setColumns(prevColumns => 
-      prevColumns.map(column => ({
-        ...column,
-        cards: column.cards.map(card => 
-          card.id === cardId 
-            ? { ...card, title: newTitle }
-            : card
-        )
-      }))
-    );
-  };
-
-  const handleColumnTitleChange = (columnId, newTitle) => {
-    setColumns(prevColumns =>
-      prevColumns.map(column =>
-        column.id === columnId
-          ? { ...column, title: newTitle }
-          : column
-      )
+  const findColumn = (id) => {
+    const column = columns.find((column) => column.id === id);
+    if (column) return column;
+    return columns.find((column) =>
+      column.cards.some((card) => card.id === id)
     );
   };
 
   return (
     <div>
       <h1>Board</h1>
-      <button onClick={addColumn} style={{ marginBottom: '16px', padding: '8px 16px' }}>
-        Add Column
-      </button>
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+        <button onClick={addColumn} style={{ padding: '8px 16px' }}>
+          Add Column
+        </button>
+        <button onClick={addCardToFirstColumn} style={{ padding: '8px 16px' }}>
+          Add Card to "To Do"
+        </button>
+      </div>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -232,7 +245,6 @@ export default function Board() {
               points={activeCard?.points || 0}
               isDragging={true}
               onPointsChange={handlePointsChange}
-              onTitleChange={handleTitleChange}
             />
           ) : null}
         </DragOverlay>

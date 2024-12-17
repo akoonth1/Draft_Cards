@@ -48,6 +48,7 @@ function Card({ id, title, points = 0, onPointsChange, isDragging }) {
             width: '100%',
             fontSize: '16px',
             fontWeight: 'bold',
+            textAlign: 'left',
           }}
         >
           {title || 'Untitled'}
