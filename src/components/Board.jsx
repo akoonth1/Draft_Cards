@@ -7,8 +7,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Column from "./Column";
 import Card from "./Card";
 import { useState } from "react";
@@ -19,90 +18,56 @@ export default function Board() {
       id: 'column-1',
       title: 'To Do',
       cards: [
-        { 
-          id: 'card-1', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
-        { 
-          id: 'card-2', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
-        { 
-          id: 'card-3', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
+        { id: 'card-1', title: 'Card 1', points: 0 },
+        { id: 'card-2', title: 'Card 2', points: 0 },
+        { id: 'card-3', title: 'Card 3', points: 0 },
       ],
     },
     {
       id: 'column-2',
       title: 'In Progress',
       cards: [
-        { 
-          id: 'card-4', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
-        { 
-          id: 'card-5', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
-        { 
-          id: 'card-6', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
+        { id: 'card-4', title: 'Card 4', points: 0 },
+        { id: 'card-5', title: 'Card 5', points: 0 },
+        { id: 'card-6', title: 'Card 6', points: 0 },
       ],
     },
     {
       id: 'column-3',
       title: 'Done',
       cards: [
-        { 
-          id: 'card-7', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
-        { 
-          id: 'card-8', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
-        { 
-          id: 'card-9', 
-          title: 'Click to edit title...', 
-          points: 0,
-          isEditing: false 
-        },
+        { id: 'card-7', title: 'Card 7', points: 0 },
+        { id: 'card-8', title: 'Card 8', points: 0 },
+        { id: 'card-9', title: 'Card 9', points: 0 },
       ],
-    }
+    },
   ]);
 
   const [activeId, setActiveId] = useState(null);
   const [activeCard, setActiveCard] = useState(null);
+  const [columnCount, setColumnCount] = useState(4); // Starting from 4 since 3 columns exist
 
-  // Initialize sensors with activation constraints
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // Minimum distance (in pixels) before drag starts
+        distance: 5, // Minimum drag distance
       },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const addColumn = () => {
+    const newColumnId = `column-${columnCount}`;
+    const newColumn = {
+      id: newColumnId,
+      title: `New Column ${columnCount}`,
+      cards: [],
+    };
+    setColumns([...columns, newColumn]);
+    setColumnCount(columnCount + 1);
+  };
 
   const findColumn = (id) => {
     const column = columns.find((column) => column.id === id);
@@ -134,8 +99,6 @@ export default function Board() {
     const overColumn = findColumn(overId);
 
     if (!activeColumn || !overColumn || activeColumn === overColumn) return;
-
-    // Optional: Visual feedback can be handled here without moving the card
   };
 
   const handleDragEnd = (event) => {
@@ -154,7 +117,7 @@ export default function Board() {
     if (!activeColumn || !overColumn) return;
 
     if (activeColumn === overColumn) {
-      // Same column - just reorder
+      // Same column - reorder
       const oldIndex = activeColumn.cards.findIndex(card => card.id === activeId);
       const newIndex = overColumn.cards.findIndex(card => card.id === overId);
 
@@ -223,9 +186,22 @@ export default function Board() {
     );
   };
 
+  const handleColumnTitleChange = (columnId, newTitle) => {
+    setColumns(prevColumns =>
+      prevColumns.map(column =>
+        column.id === columnId
+          ? { ...column, title: newTitle }
+          : column
+      )
+    );
+  };
+
   return (
     <div>
       <h1>Board</h1>
+      <button onClick={addColumn} style={{ marginBottom: '16px', padding: '8px 16px' }}>
+        Add Column
+      </button>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -244,7 +220,7 @@ export default function Board() {
                 isDragging: card.id === activeId
               }))}
               onPointsChange={handlePointsChange}
-              onTitleChange={handleTitleChange}
+              onTitleChange={handleColumnTitleChange}
             />
           ))}
         </div>
@@ -255,6 +231,8 @@ export default function Board() {
               title={activeCard?.title || 'Loading...'}
               points={activeCard?.points || 0}
               isDragging={true}
+              onPointsChange={handlePointsChange}
+              onTitleChange={handleTitleChange}
             />
           ) : null}
         </DragOverlay>
