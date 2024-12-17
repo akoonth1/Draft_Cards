@@ -131,7 +131,7 @@ function Column({ id, title, cards, onPointsChange, onTitleChange, addCard, remo
               points={card.points}
               isDragging={card.isDragging}
               onPointsChange={onPointsChange}
-              removeCard={removeCard} // Pass removeCard handler
+              removeCard={removeCard}
             />
           ))}
         </SortableContext>
