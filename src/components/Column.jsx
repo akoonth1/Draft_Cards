@@ -1,65 +1,61 @@
 // Column.jsx
 import React from 'react';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useDroppable } from '@dnd-kit/core';
 import Card from './Card';
 import { useCardContext } from './CardContext';
 
 function Column({ id, title, cards }) {
-  const { removeColumn } = useCardContext();
+  const { isOver, setNodeRef } = useDroppable({
+    id: id,
+  });
 
-  const handleRemoveColumn = () => {
-    removeColumn(id);
-  };
-
-  // Estimate the height of a single card (adjust as needed)
-  const cardHeight = 200; // Example card height in pixels
+  const { clearColumn } = useCardContext(); // Access clearColumn from context
 
   const columnStyle = {
     margin: '0 16px',
-    minHeight: `${2 * cardHeight}px`, // Minimum height set to two card heights
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#f0f0f0', // Optional: background color for visibility
-    padding: '8px',
-    borderRadius: '4px',
-  };
-
-  const headerStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '8px',
-  };
-
-  const cardsContainerStyle = {
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
+    padding: '16px',
+    backgroundColor: isOver ? '#cce5ff' : '#f0f0f0',
+    borderRadius: '8px',
+    width: '220px',
+    minHeight: '100px',
+    boxShadow: isOver ? '0 0 10px rgba(0, 123, 255, 0.5)' : 'none',
+    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+    position: 'relative',
   };
 
   return (
-    <div style={columnStyle}>
-      <div style={headerStyle}>
-        <h2>{title}</h2>
-        <button
-          onClick={handleRemoveColumn}
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '20px',
-            cursor: 'pointer',
-            color: 'red',
-          }}
-          aria-label="Remove Column"
-        >
-          &#x274C;
-        </button>
-      </div>
-      <div style={cardsContainerStyle}>
-        {cards.map((card) => (
-          <Card key={card.id} id={card.id} isDragging={false} />
+    <div ref={setNodeRef} style={columnStyle}>
+      <h2 style={{ textAlign: 'center' }}>{title}</h2>
+      <button 
+        onClick={() => clearColumn(id)} 
+        style={{
+          position: 'absolute',
+          top: '16px',
+          right: '16px',
+          padding: '4px 8px',
+          backgroundColor: '#ff4d4f',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+        }}
+      >
+        Clear
+      </button>
+      <SortableContext
+        items={cards.map(card => card.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        {cards.map((card, index) => (
+          <Card
+            key={card.id}
+            id={card.id}
+            image_url={card.image_url}
+            index={index}
+          />
         ))}
-      </div>
-      {/* Additional column controls if any */}
+      </SortableContext>
     </div>
   );
 }

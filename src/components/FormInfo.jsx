@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useCardContext } from './CardContext';
 
 function FormInfo({ id }) {
-  const { getCardById, updateCardInfoText } = useCardContext();
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempInfo, setTempInfo] = useState('');
+  const { getCardById, updateCardInfo } = useCardContext();
+  
   const cardData = getCardById(id);
 
   if (!cardData) {
@@ -10,65 +13,76 @@ function FormInfo({ id }) {
     return null;
   }
 
-  // State for editing info text
-  const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const [tempInfoText, setTempInfoText] = useState(cardData.infoText || '');
-
-  useEffect(() => {
-    setTempInfoText(cardData.infoText || '');
-  }, [cardData.infoText]);
-
-  // Handlers for editing info text
-  const handleInfoClick = () => {
-    setIsEditingInfo(true);
+  const handleEdit = () => {
+    setTempInfo(cardData?.info || '');
+    setIsEditing(true);
   };
 
-  const handleInfoChangeLocal = (e) => {
-    setTempInfoText(e.target.value);
+  const handleSave = () => {
+    updateCardInfo(id, tempInfo);
+    setIsEditing(false);
   };
 
-  const handleInfoSave = () => {
-    updateCardInfoText(id, tempInfoText);
-    setIsEditingInfo(false);
-  };
-
-  const handleInfoCancel = () => {
-    setTempInfoText(cardData.infoText || '');
-    setIsEditingInfo(false);
+  const handleCancel = () => {
+    setIsEditing(false);
   };
 
   return (
-    <div>
-      {isEditingInfo ? (
-        <div>
+    <div style={{ padding: '4px 8px' }}>
+      {isEditing ? (
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <textarea
-            value={tempInfoText}
-            onChange={handleInfoChangeLocal}
-            autoFocus
+            value={tempInfo}
+            onChange={(e) => setTempInfo(e.target.value)}
             style={{
               width: '100%',
-              padding: '6px 10px',
-              border: '1px solid #ccc',
+              padding: '4px 8px',
               borderRadius: '4px',
-              fontSize: '14px',
-              outline: 'none',
-              backgroundColor: '#fff',
-              resize: 'vertical',
+              border: '1px solid #ccc',
+              minHeight: '60px',
+              resize: 'vertical'
             }}
           />
-          <button onClick={handleInfoSave}>Save</button>
-          <button onClick={handleInfoCancel}>Cancel</button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <button 
+              onClick={handleSave}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Save
+            </button>
+            <button 
+              onClick={handleCancel}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: '#f44336',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       ) : (
-        <div
-          onClick={handleInfoClick}
+        <div 
+          onClick={handleEdit}
           style={{
             padding: '4px 8px',
-            cursor: 'text',
-            minHeight: '20px',
+            minHeight: '24px',
+            cursor: 'pointer',
+            color: '#fff'
           }}
         >
-          {cardData.infoText || 'Click to add info...'}
+          {cardData?.info || 'Click to add info...'}
         </div>
       )}
     </div>
