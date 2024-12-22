@@ -1,164 +1,61 @@
 // Column.jsx
-import { useState } from 'react';
-import Card from "./Card";
-import { CSS } from "@dnd-kit/utilities";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
+import React from 'react';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useDroppable } from '@dnd-kit/core';
+import Card from './Card';
+import { useCardContext } from './CardContext';
 
-function Column({ id, title, cards, onPointsChange, onTitleChange, addCard, removeCard, removeColumn }) {
-  const { setNodeRef, isOver } = useDroppable({
-    id,
-    data: {
-      type: 'column',
-      accepts: ['card']
-    }
+function Column({ id, title, cards }) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: id,
   });
 
-  const style = {
-    padding: 16,
-    minHeight: 200,
-    width: 400,
-    backgroundColor: isOver ? "rgba(0, 0, 0, 0.1)" : "transparent",
-    border: '2px solid #ccc',
-    borderRadius: '4px',
-    margin: '8px',
-    transition: 'background-color 0.2s ease'
-  };
+  const { clearColumn } = useCardContext(); // Access clearColumn from context
 
-  // Calculate total points
-  const totalPoints = cards.reduce((sum, card) => sum + (card.points || 0), 0);
-
-  // State for editing title
-  const [isEditing, setIsEditing] = useState(false);
-  const [tempTitle, setTempTitle] = useState(title);
-
-  const handleTitleClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleTitleChangeLocal = (e) => {
-    setTempTitle(e.target.value);
-  };
-
-  const handleTitleSave = () => {
-    onTitleChange(id, tempTitle);
-    setIsEditing(false);
-  };
-
-  const handleTitleCancel = () => {
-    setTempTitle(title);
-    setIsEditing(false);
-  };
-
-  const handleAddCard = () => {
-    addCard(id);
-  };
-
-  const handleRemoveColumn = () => {
-    if (cards.length > 0) {
-      alert("Cannot remove a column that is not empty.");
-      return;
-    }
-    removeColumn(id);
+  const columnStyle = {
+    margin: '0 16px',
+    padding: '16px',
+    backgroundColor: isOver ? '#cce5ff' : '#f0f0f0',
+    borderRadius: '8px',
+    width: '220px',
+    minHeight: '100px',
+    boxShadow: isOver ? '0 0 10px rgba(0, 123, 255, 0.5)' : 'none',
+    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+    position: 'relative',
   };
 
   return (
-    <div className="column">
-      <h3 className="column-title">
-        {isEditing ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <input
-              type="text"
-              value={tempTitle}
-              onChange={handleTitleChangeLocal}
-              autoFocus
-              style={{
-                flex: 1,
-                padding: '6px 10px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '14px',
-                outline: 'none',
-              }}
-            />
-            <button
-              onClick={handleTitleSave}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              Save
-            </button>
-            <button
-              onClick={handleTitleCancel}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: '#f44336',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <span onClick={handleTitleClick} style={{ cursor: 'pointer' }}>
-            {title || 'Untitled Column'}
-          </span>
-        )}
-      </h3>
-      <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>
-        Total Points: {totalPoints}
-      </div>
-      <div ref={setNodeRef} style={style}>
-        <SortableContext 
-          id={id} 
-          items={cards.map(card => card.id)} 
-          strategy={verticalListSortingStrategy}
-        >
-          {cards.map((card) => (
-            <Card 
-              key={card.id} 
-              id={card.id} 
-              title={card.title}
-              points={card.points}
-              isDragging={card.isDragging}
-              onPointsChange={onPointsChange}
-              removeCard={removeCard}
-            />
-          ))}
-        </SortableContext>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px' }}>
-        <button 
-          onClick={handleAddCard} 
-          style={{ padding: '6px 12px', cursor: 'pointer' }}
-        >
-          Add Card
-        </button>
-        {cards.length === 0 && (
-          <button 
-            onClick={handleRemoveColumn} 
-            style={{ 
-              padding: '6px 12px', 
-              cursor: 'pointer', 
-              backgroundColor: '#f44336',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-            }}
-          >
-            Remove Column
-          </button>
-        )}
-      </div>
+    <div ref={setNodeRef} style={columnStyle}>
+      <h2 style={{ textAlign: 'center' }}>{title}</h2>
+      <button 
+        onClick={() => clearColumn(id)} 
+        style={{
+          position: 'absolute',
+          top: '16px',
+          right: '16px',
+          padding: '4px 8px',
+          backgroundColor: '#ff4d4f',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+        }}
+      >
+        Clear
+      </button>
+      <SortableContext
+        items={cards.map(card => card.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        {cards.map((card, index) => (
+          <Card
+            key={card.id}
+            id={card.id}
+            image_url={card.image_url}
+            index={index}
+          />
+        ))}
+      </SortableContext>
     </div>
   );
 }

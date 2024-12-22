@@ -1,189 +1,90 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useCardContext } from './CardContext';
 
-function FormInfo({ points = 0, onPointsChange }) {
-  const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const [infoText, setInfoText] = useState('');
+function FormInfo({ id }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempInfo, setTempInfo] = useState('');
+  const { getCardById, updateCardInfo } = useCardContext();
   
-  const [isEditingPoints, setIsEditingPoints] = useState(false);
-  const [pointsInput, setPointsInput] = useState(points.toString());
-  
-  const [tempInfoText, setTempInfoText] = useState(infoText);
-  const [tempPoints, setTempPoints] = useState(pointsInput);
+  const cardData = getCardById(id);
 
-  // Handlers for Info Text
-  const handleInfoClick = () => {
-    setTempInfoText(infoText);
-    setIsEditingInfo(true);
+  if (!cardData) {
+    console.warn(`Card data not found for id: ${id}`);
+    return null;
+  }
+
+  const handleEdit = () => {
+    setTempInfo(cardData?.info || '');
+    setIsEditing(true);
   };
 
-  const handleInfoChange = (e) => {
-    setTempInfoText(e.target.value);
+  const handleSave = () => {
+    updateCardInfo(id, tempInfo);
+    setIsEditing(false);
   };
 
-  const handleInfoSave = () => {
-    setInfoText(tempInfoText);
-    // Implement onSubmit for info text if needed
-    setIsEditingInfo(false);
-  };
-
-  const handleInfoCancel = () => {
-    setTempInfoText(infoText);
-    setIsEditingInfo(false);
-  };
-
-  // Handlers for Points
-  const handlePointsClick = (e) => {
-    e.stopPropagation();
-    setTempPoints(pointsInput);
-    setIsEditingPoints(true);
-  };
-
-  const handlePointsChangeLocal = (e) => {
-    setTempPoints(e.target.value);
-  };
-
-  const handlePointsSave = () => {
-    const newPoints = parseInt(tempPoints, 10);
-    if (!isNaN(newPoints)) {
-      onPointsChange(newPoints);
-    }
-    setIsEditingPoints(false);
-  };
-
-  const handlePointsCancel = () => {
-    setTempPoints(pointsInput);
-    setIsEditingPoints(false);
+  const handleCancel = () => {
+    setIsEditing(false);
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      
-      {/* Info Text Section */}
-      <div>
-        {isEditingInfo ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <input
-              type="text"
-              value={tempInfoText}
-              onChange={handleInfoChange}
-              autoFocus
-              placeholder="Enter info..."
+    <div style={{ padding: '4px 8px' }}>
+      {isEditing ? (
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <textarea
+            value={tempInfo}
+            onChange={(e) => setTempInfo(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+              minHeight: '60px',
+              resize: 'vertical'
+            }}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <button 
+              onClick={handleSave}
               style={{
-                flex: 1,
-                padding: '6px 10px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '14px',
-                outline: 'none',
-                backgroundColor: '#fff',
-              }}
-            />
-            <button
-              onClick={handleInfoSave}
-              style={{
-                padding: '6px 12px',
+                padding: '4px 8px',
                 backgroundColor: '#4CAF50',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer',
+                cursor: 'pointer'
               }}
             >
               Save
             </button>
-            <button
-              onClick={handleInfoCancel}
+            <button 
+              onClick={handleCancel}
               style={{
-                padding: '6px 12px',
+                padding: '4px 8px',
                 backgroundColor: '#f44336',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer',
+                cursor: 'pointer'
               }}
             >
               Cancel
             </button>
           </div>
-        ) : (
-          <div
-            onClick={handleInfoClick}
-            style={{
-              padding: '4px 8px',
-              border: '1px solid transparent',
-              borderRadius: '4px',
-              cursor: 'text',
-              minHeight: '20px',
-            }}
-          >
-            {infoText || 'Click to add info...'}
-          </div>
-        )}
-      </div>
-      
-      {/* Points Section */}
-      <div>
-        {isEditingPoints ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <input
-              type="number"
-              value={tempPoints}
-              onChange={handlePointsChangeLocal}
-              autoFocus
-              style={{
-                width: '80px',
-                padding: '6px 10px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '14px',
-                outline: 'none',
-                textAlign: 'right',
-                backgroundColor: '#fff',
-              }}
-            />
-            <button
-              onClick={handlePointsSave}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              Save
-            </button>
-            <button
-              onClick={handlePointsCancel}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: '#f44336',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <div
-            onClick={handlePointsClick}
-            style={{
-              padding: '4px 8px',
-              border: '1px solid transparent',
-              borderRadius: '4px',
-              cursor: 'text',
-              textAlign: 'right',
-            }}
-          >
-            Points: {points}
-          </div>
-        )}
-      </div>
-      
+        </div>
+      ) : (
+        <div 
+          onClick={handleEdit}
+          style={{
+            padding: '4px 8px',
+            minHeight: '24px',
+            cursor: 'pointer',
+            color: '#fff'
+          }}
+        >
+          {cardData?.info || 'Click to add info...'}
+        </div>
+      )}
     </div>
   );
 }

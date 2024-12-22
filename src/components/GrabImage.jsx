@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useCardContext } from './CardContext';
 import characterData from '../Data/characters.mjs';
 
 export default function GrabImage() {
-
-  const normalizeName = (name) => {
-    return name.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase().trim();
-  };
-
-  const [availableCharacters, setAvailableCharacters] = useState([]);
+  const { addCardFromCharacter } = useCardContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null); // New state for success messages
 
+  const normalizeName = (name) => 
+    name.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase().trim();
+
+  // Replace or expand these with your actual character lists
   const allCharacterNames = [
     ...characterData.characters[0].straw_hat_crew,
     // ...characterData.characters[0].emperors_and_their_crews,
@@ -29,22 +30,49 @@ export default function GrabImage() {
   const fetchCharacters = async () => {
     setLoading(true);
     setError(null);
+    setMessage(null); // Reset message
     try {
       const response = await axios.get('https://api.jikan.moe/v4/anime/21/characters');
       const filteredCharacters = response.data.data.filter((character) => {
         const characterName = normalizeName(character.character.name);
+        console.log("Filtered characterName:", response.data.data);
         return allCharacterNames.includes(characterName);
       });
 
-      // Transform filteredCharacters to include only name, image_url, and mal_id
+      // Transform data to only include relevant fields
       const processedCharacters = filteredCharacters.map((character) => ({
         name: character.character.name,
-        image_url:character.character.images?.jpg?.image_url || null,
-        mal_id: character.character.mal_id,
+        image_url: character.character.images?.jpg?.image_url || 'https://via.placeholder.com/400x200.png?text=No+Image',
+        mal_id: character.character.mal_id
       }));
 
-      setAvailableCharacters(processedCharacters);
-      console.log('Processed Characters:', processedCharacters);
+      console.log("Processed Characters:", processedCharacters);
+
+      // Keep track of duplicates
+      let duplicates = [];
+
+      // Populate the "To Do" column with each fetched character
+      processedCharacters.forEach(character => {
+        console.log(
+          "Adding card - Name:",
+          character.name,
+          "| Image:",
+          character.image_url,
+          "| mal_id:",
+          character.mal_id
+        );
+        const success = addCardFromCharacter('column-1', character);
+        if (!success) {
+          duplicates.push(character.name);
+        }
+      });
+
+      if (duplicates.length > 0) {
+        setMessage(`Skipped adding duplicate cards for: ${duplicates.join(', ')}`);
+      } else {
+        setMessage('All characters added successfully!');
+      }
+
     } catch (error) {
       console.error('Error fetching characters:', error);
       setError('Failed to fetch characters. Please try again later.');
@@ -55,49 +83,31 @@ export default function GrabImage() {
 
   return (
     <div>
-      <h1>Characters</h1>
-      <button onClick={fetchCharacters} disabled={loading} style={{ padding: '8px 16px', cursor: 'pointer' }}>
-        {loading ? 'Fetching...' : 'Fetch Characters'}
+      <button onClick={fetchCharacters} disabled={loading}>
+        {loading ? 'Loading...' : 'Fetch Characters'}
       </button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {availableCharacters.length > 0 ? (
-        <ul style={{ listStyleType: 'none', padding: 0 }}>
-          {availableCharacters.map((character) => (
-            <li key={character.mal_id} style={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
-              {character.image_url ? (
-                <img 
-                  src={character.image_url} 
-                  alt={character.name} 
-                  style={{ width: '100px', height: 'auto', borderRadius: '8px', marginRight: '16px' }} 
-                />
-              ) : (
-                <div 
-                  style={{
-                    width: '100px',
-                    height: '150px',
-                    backgroundColor: '#ccc',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '8px',
-                    marginRight: '16px',
-                    color: '#fff',
-                    fontSize: '14px'
-                  }}
-                >
-                  No Image Available
-                </div>
-              )}
-              <div>
-                <h2 style={{ margin: '0 0 8px 0' }}>{character.name}</h2>
-                <p><strong>MAL ID:</strong> {character.mal_id}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        !loading && <p>No characters fetched yet. Click "Fetch Characters" to load data.</p>
-      )}
+      {message && <p style={{ color: 'green' }}>{message}</p>}
     </div>
   );
 }
+
+// CardContext.jsx (fixed)
+const addCardFromCharacter = (columnId, character) => {
+  const newCard = {
+    id: `card-${character.mal_id}`,   // or just `${character.mal_id}`
+    title: character.name,
+    points: 0,
+    image_url: character.image_url,
+    mal_id: character.mal_id,
+    infoText: ''
+  };
+
+  setColumns(prevColumns =>
+    prevColumns.map(col =>
+      col.id === columnId
+        ? { ...col, cards: [...col.cards, newCard] }
+        : col
+    )
+  );
+};
