@@ -8,17 +8,17 @@ export const CardProvider = ({ children }) => {
   const [columns, setColumns] = useState([
     {
       id: 'column-1',
-      title: 'To Do',
+      title: 'Source',
       cards: []
     },
     {
       id: 'column-2',
-      title: 'In Progress',
+      title: 'Team 1',
       cards: []
     },
     {
       id: 'column-3',
-      title: 'Done',
+      title: 'Team 2',
       cards: []
     }
   ]);

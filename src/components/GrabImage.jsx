@@ -13,7 +13,19 @@ export default function GrabImage() {
     name.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase().trim();
 
   // Replace or expand these with your actual character lists
-  const allCharacterNames = [...characterData.characters[0].straw_hat_crew].map(normalizeName);
+  const allCharacterNames = [
+    ...characterData.characters[0].straw_hat_crew,
+    // ...characterData.characters[0].emperors_and_their_crews,
+    // ...characterData.characters[0].marines_and_world_government,
+    // ...characterData.characters[0].warlords_former_and_current,
+    // ...characterData.characters[0].revolutionary_army,
+    // ...characterData.characters[0].major_allies,
+    // ...characterData.characters[0].significant_antagonists,
+    // ...characterData.characters[0].wano_characters,
+    // ...characterData.characters[0].other_important_characters,
+    // ...characterData.characters[0].baroque_works,
+    // ...characterData.characters[0].the_giants
+  ].map(normalizeName);
 
   const fetchCharacters = async () => {
     setLoading(true);
@@ -23,7 +35,7 @@ export default function GrabImage() {
       const response = await axios.get('https://api.jikan.moe/v4/anime/21/characters');
       const filteredCharacters = response.data.data.filter((character) => {
         const characterName = normalizeName(character.character.name);
-        console.log("Filtered characterName:", characterName);
+        console.log("Filtered characterName:", response.data.data);
         return allCharacterNames.includes(characterName);
       });
 
