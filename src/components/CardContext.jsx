@@ -1,30 +1,79 @@
 // CardContext.jsx
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 
 export const CardContext = createContext();
 
-export const CardProvider = ({ children }) => {
-  const [columns, setColumns] = useState([
-    {
-      id: 'column-1',
-      title: 'Source',
-      cards: []
-    },
-    {
-      id: 'column-2',
-      title: 'Team 1',
-      cards: []
-    },
-    {
-      id: 'column-3',
-      title: 'Team 2',
-      cards: []
+export function CardProvider({ children }) {
+  const LOCAL_STORAGE_KEY = 'columnsData';
+
+  // Initialize columns state from localStorage or use default
+  const [columns, setColumns] = useState(() => {
+    try {
+      const storedColumns = localStorage.getItem(LOCAL_STORAGE_KEY);
+      return storedColumns
+        ? JSON.parse(storedColumns)
+        : [
+            {
+              id: 'column-1',
+              title: 'Source',
+              cards: []
+            },
+            {
+              id: 'column-2',
+              title: 'Team 1',
+              cards: []
+            },
+            {
+              id: 'column-3',
+              title: 'Team 2',
+              cards: []
+            }
+          ];
+    } catch (error) {
+      console.error('Failed to load columns from localStorage:', error);
+      return [
+        {
+          id: 'column-1',
+          title: 'Source',
+          cards: []
+        },
+        {
+          id: 'column-2',
+          title: 'Team 1',
+          cards: []
+        },
+        {
+          id: 'column-3',
+          title: 'Team 2',
+          cards: []
+        }
+      ];
     }
-  ]);
+  });
+
+  // Save columns to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(columns));
+    } catch (error) {
+      console.error('Failed to save columns to localStorage:', error);
+    }
+  }, [columns]);
+
+  const updateCardPoints = useCallback((id, points) => {
+    setColumns(prev =>
+      prev.map(col => ({
+        ...col,
+        cards: col.cards.map(card =>
+          card.id === id ? { ...card, points } : card
+        )
+      }))
+    );
+  }, []);
 
   // Function to add a new card from a character
-  const addCardFromCharacter = (columnId, character) => {
+  const addCardFromCharacter = useCallback((columnId, character) => {
     const newCardId = `card-${character.mal_id}`;
 
     // Check if the card already exists in any column
@@ -56,10 +105,10 @@ export const CardProvider = ({ children }) => {
 
     console.log(`Card added: ${JSON.stringify(newCard)}`);
     return true; // Indicate successful addition
-  };
+  }, [columns]);
 
   // Function to move or reorder a card
-  const moveCard = (activeId, overId, fromColumnId, toColumnId) => {
+  const moveCard = useCallback((activeId, overId, fromColumnId, toColumnId) => {
     if (fromColumnId === toColumnId) {
       // Reordering within the same column
       const column = columns.find(col => col.id === fromColumnId);
@@ -113,7 +162,7 @@ export const CardProvider = ({ children }) => {
 
       console.log(`Moved card ${activeId} from ${fromColumnId} to ${toColumnId} at position ${insertIndex}`);
     }
-  };
+  }, [columns]);
 
   // Function to add a new column
   const addColumn = (title) => {
@@ -126,16 +175,26 @@ export const CardProvider = ({ children }) => {
     console.log(`Added new column: ${title}`);
   };
 
+  // Function to remove a column by ID
+  const removeColumn = useCallback((columnId) => {
+    setColumns(prevColumns => prevColumns.filter(col => col.id !== columnId));
+    console.log(`Removed column with id: ${columnId}`);
+  }, []);
+
   // Function to get card by ID
   const getCardById = (id) => {
+    if (!id) {
+      console.warn('getCardById called with undefined id');
+      return null;
+    }
+
     for (const column of columns) {
       const card = column.cards.find(card => card.id === id);
       if (card) {
-        console.log(`Found card: ${card.title}, id: ${card.id}`);
         return card;
       }
     }
-    console.log(`No card found with id: ${id}`);
+    console.warn(`Card not found with id: ${id}`);
     return null;
   };
 
@@ -160,6 +219,8 @@ export const CardProvider = ({ children }) => {
         addColumn,
         getCardById,
         clearColumn,
+        updateCardPoints, // Added here
+        removeColumn, // Add removeColumn to the context value
       }}
     >
       {children}

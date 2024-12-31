@@ -1,10 +1,10 @@
 // Board.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DndContext, DragOverlay, rectIntersection } from '@dnd-kit/core';
 import { useCardContext } from './CardContext';
 import Column from './Column';
 import Card from './Card';
-import { arrayMove } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 export default function Board() {
   const { columns, moveCard, addColumn, getCardById } = useCardContext();
@@ -70,9 +70,33 @@ export default function Board() {
     setActiveCard(null);
   };
 
+  // Handler to clear localStorage and reload the app
+  const handleClearLocalStorage = () => {
+    localStorage.removeItem('columnsData');
+    window.location.reload();
+  };
+
   return (
     <div>
-      <h1>Kanban Board</h1>
+      <h1>Draft Box</h1>
+      
+      {/* Reset Board Button */}
+      <button 
+        onClick={handleClearLocalStorage} 
+        style={{ 
+          marginBottom: '16px', 
+          backgroundColor: '#ff4d4f', 
+          color: 'white', 
+          padding: '8px 16px', 
+          border: 'none', 
+          borderRadius: '4px', 
+          cursor: 'pointer',
+          marginRight: '8px'
+        }}
+      >
+        Reset Board
+      </button>
+
       {isAddingColumn ? (
         <div style={{ marginBottom: '16px' }}>
           <input
@@ -80,13 +104,34 @@ export default function Board() {
             value={newColumnTitle}
             onChange={(e) => setNewColumnTitle(e.target.value)}
             placeholder="Enter column name"
-            style={{ marginRight: '8px' }}
+            style={{ marginRight: '8px', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
-          <button onClick={handleAddColumn} style={{ marginRight: '4px' }}>Add</button>
-          <button onClick={() => setIsAddingColumn(false)}>Cancel</button>
+          <button 
+            onClick={handleAddColumn} 
+            style={{ marginRight: '4px', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer', backgroundColor: '#1a1a1a', color: 'white' }}
+          >
+            Add
+          </button>
+          <button 
+            onClick={() => setIsAddingColumn(false)} 
+            style={{ padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer', backgroundColor: '#ccc' }}
+          >
+            Cancel
+          </button>
         </div>
       ) : (
-        <button onClick={() => setIsAddingColumn(true)} style={{ marginBottom: '16px' }}>
+        <button 
+          onClick={() => setIsAddingColumn(true)} 
+          style={{ 
+            marginBottom: '16px', 
+            padding: '8px 16px', 
+            border: 'none', 
+            borderRadius: '4px', 
+            cursor: 'pointer', 
+            backgroundColor: '#1a1a1a', 
+            color: 'white' 
+          }}
+        >
           Add Column
         </button>
       )}
@@ -96,27 +141,38 @@ export default function Board() {
         onDragCancel={handleDragCancel}
         collisionDetection={rectIntersection}
       >
-        <div style={{ display: "flex", gap: '16px' }}>
-          {columns.map((column) => (
-            <Column 
-              key={column.id}
-              id={column.id}
-              title={column.title}
-              cards={column.cards.map(card => ({
-                ...card,
-                isDragging: card.id === activeId,
-                image_url: card.image_url // Ensure image URL is passed
-              }))}
-            />
-          ))}
+        <div style={boardStyle}>
+          <SortableContext
+            items={columns.map(column => column.id)}
+            strategy={verticalListSortingStrategy} // Arrange columns vertically
+          >
+            {Array.isArray(columns) && columns.length > 0 ? (
+              columns.map((column) => (
+                <Column 
+                  key={column.id}
+                  id={column.id}
+                  title={column.title}
+                  cards={column.cards.map(card => ({
+                    ...card,
+                    isDragging: card.id === activeId,
+                    image_url: card.image_url
+                  }))}
+                />
+              ))
+            ) : (
+              <p>No columns available. Please add a column.</p>
+            )}
+          </SortableContext>
         </div>
         <DragOverlay>
           {activeId && activeCard ? (
             <Card 
+              key={activeId}
               id={activeId} 
-              {...activeCard}
               isDragging={true}
-              image_url={activeCard.image_url} // Pass image URL to overlay
+              image_url={activeCard.image_url}
+              title={activeCard.title}
+              points={activeCard.points}
             />
           ) : null}
         </DragOverlay>
@@ -124,3 +180,13 @@ export default function Board() {
     </div>
   );
 }
+
+const boardStyle = {
+  display: 'flex',
+  flexDirection: 'column', // Stack columns vertically
+  alignItems: 'center',
+  padding: '16px',
+  backgroundColor: '#e9ecef',
+  minHeight: '100vh',
+  minWidth: '100vw',
+};
