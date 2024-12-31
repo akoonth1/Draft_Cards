@@ -17,7 +17,7 @@ function App() {
 
       <Board />
       <div>
-        <FormInfo />
+        {/* <FormInfo /> */}
       </div>
       <div>
         <GrabImage />

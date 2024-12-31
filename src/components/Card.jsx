@@ -43,7 +43,7 @@ function Card({ id, isDragging, image_url }) {
   // Sync with cardData changes
   useEffect(() => {
     // Remove or comment out the line that resets tempPoints:
-    // setTempPoints(cardData.points || 0);
+    setTempPoints(cardData.points || 0);
   }, [cardData.points]);
 
   const handlePointsClick = () => {
@@ -56,11 +56,7 @@ function Card({ id, isDragging, image_url }) {
     setIsEditingPoints(false);
   };
 
-  const handlePointsKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handlePointsBlur();
-    }
-  };
+
 
   const handleTogglePoints = () => {
     setShowPoints(!showPoints);
@@ -72,8 +68,8 @@ function Card({ id, isDragging, image_url }) {
     backgroundImage: `url(${image_url || cardData.image_url})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    width: '200px',
-    height: '350px',
+    width: '120px',
+    height: '200px',
     padding: '0px',
     margin: '0 0 0px 0',
     backgroundColor: 'white',
@@ -96,13 +92,13 @@ function Card({ id, isDragging, image_url }) {
         {/* Toggle Button */}
         <button
           onClick={handleTogglePoints}
-          style={{ position: 'absolute', top: '8px', left: '8px' }}
+          style={{ position: 'absolute', top: '4px', left: '4px', backgroundColor: 'rgba(241, 230, 230, 0.6)', width: "1vw" , height: "3vh" }}
         >
-          {showPoints ? 'X' : 'O'}
+          {showPoints ? 'P' : 'O'}
         </button>
 
         {/* Conditionally render points */}
-        {showPoints && (
+        {!showPoints && (
           <div
             style={{
               position: 'absolute',
@@ -112,7 +108,7 @@ function Card({ id, isDragging, image_url }) {
               color: 'white',
               padding: '4px 8px',
               borderRadius: '12px',
-              fontSize: '14px',
+              fontSize: '10px',
               fontWeight: 'bold',
               display: 'flex',
               alignItems: 'center',
@@ -134,7 +130,7 @@ function Card({ id, isDragging, image_url }) {
                 backgroundColor: 'transparent',
                 border: 'none',
                 color: 'white',
-                fontSize: '16px',
+                fontSize: '10px',
                 cursor: 'pointer',
               }}
             >
@@ -172,11 +168,12 @@ function Card({ id, isDragging, image_url }) {
                 backgroundColor: 'transparent',
                 border: 'none',
                 color: 'white',
-                fontSize: '16px',
+                fontSize: '10px',
                 cursor: 'pointer',
               }}
             >
               +
+              
             </button>
           </div>
         )}
@@ -207,7 +204,9 @@ function Card({ id, isDragging, image_url }) {
           color: 'white',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
+          fontSize: '12px',
+      
         }}>
           <h3 style={{ margin: '8px 0' }}>{cardData.title || 'Untitled'}</h3>
         </div>

@@ -15,7 +15,7 @@ export default function GrabImage() {
   // Replace or expand these with your actual character lists
   const allCharacterNames = [
     ...characterData.characters[0].straw_hat_crew,
-    // ...characterData.characters[0].emperors_and_their_crews,
+    ...characterData.characters[0].emperors_and_their_crews,
     // ...characterData.characters[0].marines_and_world_government,
     // ...characterData.characters[0].warlords_former_and_current,
     // ...characterData.characters[0].revolutionary_army,
