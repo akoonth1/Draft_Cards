@@ -72,7 +72,7 @@ export default function Board() {
 
   return (
     <div>
-      <h1>Kanban Board</h1>
+      <h1>Draft Box</h1>
       {isAddingColumn ? (
         <div style={{ marginBottom: '16px' }}>
           <input
@@ -96,16 +96,22 @@ export default function Board() {
         onDragCancel={handleDragCancel}
         collisionDetection={rectIntersection}
       >
-        <div style={{ display: "flex", gap: '16px' }}>
+        <div style={{ 
+          display: "flex", 
+          gap: '16px', 
+          overflowX: 'auto',
+          padding: '16px'
+        }}>
           {columns.map((column) => (
             <Column 
               key={column.id}
               id={column.id}
               title={column.title}
               cards={column.cards.map(card => ({
+                id: card.id, // Ensure ID is explicitly passed
                 ...card,
                 isDragging: card.id === activeId,
-                image_url: card.image_url // Ensure image URL is passed
+                image_url: card.image_url
               }))}
             />
           ))}
@@ -113,10 +119,10 @@ export default function Board() {
         <DragOverlay>
           {activeId && activeCard ? (
             <Card 
+              key={activeId}
               id={activeId} 
-              {...activeCard}
               isDragging={true}
-              image_url={activeCard.image_url} // Pass image URL to overlay
+              {...activeCard}
             />
           ) : null}
         </DragOverlay>

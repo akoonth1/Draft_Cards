@@ -1,16 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCardContext } from './CardContext';
 
 function FormInfo({ id }) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempInfo, setTempInfo] = useState('');
+  const [cardData, setCardData] = useState(null);
+  const [error, setError] = useState(null);
   const { getCardById, updateCardInfo } = useCardContext();
-  
-  const cardData = getCardById(id);
+
+  useEffect(() => {
+    if (!id) {
+      setError('No card ID provided');
+      return;
+    }
+
+    const card = getCardById(id);
+    if (!card) {
+      setError(`Card not found: ${id}`);
+      return;
+    }
+
+    setCardData(card);
+    setTempInfo(card.info || '');
+    setError(null);
+  }, [id, getCardById]);
+
+  if (error) {
+    return <div style={{ color: 'red', padding: '8px' }}>{error}</div>;
+  }
 
   if (!cardData) {
-    console.warn(`Card data not found for id: ${id}`);
-    return null;
+    return <div>Loading...</div>;
   }
 
   const handleEdit = () => {
