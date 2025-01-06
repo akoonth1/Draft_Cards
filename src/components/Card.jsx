@@ -92,7 +92,7 @@ function Card({ id, isDragging, image_url }) {
         {/* Toggle Button */}
         <button
           onClick={handleTogglePoints}
-          style={{ position: 'absolute', top: '4px', left: '4px', backgroundColor: 'rgba(241, 230, 230, 0.6)', width: "1vw" , height: "3vh" }}
+          style={{ position: 'absolute', top: '4px', left: '4px', backgroundColor: 'rgba(241, 230, 230, 0.6)', width: "1vw" , height: "2vh", textAlign: "center", fontSize: "8px" }}
         >
           {showPoints ? 'P' : 'O'}
         </button>
