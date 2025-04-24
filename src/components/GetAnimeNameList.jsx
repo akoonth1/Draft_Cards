@@ -17,10 +17,10 @@ export default function GetAnimeNameList() {
     const fetchAllAnime = async () => {
       try {
         const results = [];
-        for (let i = 1; i <= 80; i++) {
+        for (let i = 1; i <= 180; i++) {
           if (animeArray.includes(i)) {
             // Delay between requests
-            await new Promise((resolve) => setTimeout(resolve, 200 + i));
+            await new Promise((resolve) => setTimeout(resolve, 500 + i));
             const response = await axios.get(`https://api.jikan.moe/v4/anime/${i}`);
             results.push(response.data.data);
           }
@@ -46,7 +46,7 @@ export default function GetAnimeNameList() {
       <button onClick={clearCache} style={buttonStyle}>
         Clear Cache
       </button>
-      <h1>Anime Details (IDs 1 - 45)</h1>
+      <h1>Anime Details </h1>
       {animeList.length > 0 ? (
         <ul>
           {animeList.map((anime) => (

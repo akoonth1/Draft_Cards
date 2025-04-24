@@ -9,6 +9,8 @@ export default function GrabImage() {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null); // New state for success messages
 
+  let id =35243
+
   const normalizeName = (name) => 
     name.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase().trim();
 
@@ -16,7 +18,7 @@ export default function GrabImage() {
   const allCharacterNames = [
     ...characterData.characters[0].straw_hat_crew,
     ...characterData.characters[0].emperors_and_their_crews,
-    // ...characterData.characters[0].marines_and_world_government,
+    ...characterData.characters[0].marines_and_world_government,
     // ...characterData.characters[0].warlords_former_and_current,
     // ...characterData.characters[0].revolutionary_army,
     // ...characterData.characters[0].major_allies,
@@ -32,12 +34,17 @@ export default function GrabImage() {
     setError(null);
     setMessage(null); // Reset message
     try {
-      const response = await axios.get('https://api.jikan.moe/v4/anime/21/characters');
+      const response = await axios.get(`https://api.jikan.moe/v4/manga/${id}/characters`);
       const filteredCharacters = response.data.data.filter((character) => {
-        const characterName = normalizeName(character.character.name);
-        console.log("Filtered characterName:", response.data.data);
-        return allCharacterNames.includes(characterName);
+      const characterName = normalizeName(character.character.name);
+      console.log("Filtered characterName:", characterName);
+     // return allCharacterNames.includes(characterName);
+      return characterName
       });
+
+      // Log all results for debugging
+      console.log("All fetched characters:", response.data.data);
+      console.log("Filtered characters:", filteredCharacters);
 
       // Transform data to only include relevant fields
       const processedCharacters = filteredCharacters.map((character) => ({

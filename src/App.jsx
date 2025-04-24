@@ -8,6 +8,8 @@ import { useDroppable } from '@dnd-kit/core'
 import GrabImage from './components/GrabImage'
 import { CardProvider } from './components/CardContext'
 import GetAnimeNameList from './components/GetAnimeNameList'
+import { useCardContext } from './components/CardContext'
+import SearchAnime from './components/AnimeSearch'
 
 
 function App() {
@@ -20,6 +22,9 @@ function App() {
       <Board />
       <div>
         {/* <FormInfo /> */}
+      </div>
+      <div>
+        <SearchAnime />
       </div>
       <div>
         <GrabImage />
