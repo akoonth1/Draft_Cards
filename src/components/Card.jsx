@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { useCardContext } from './CardContext';
 
 function Card({ id, isDragging, image_url }) {
-  const { getCardById, updateCardPoints } = useCardContext();
+  const { getCardById, updateCardPoints, removeCard } = useCardContext();
   const cardData = getCardById(id) || {};
   const [tempPoints, setTempPoints] = useState(cardData.points || 0);
   const [showPoints, setShowPoints] = useState(true);
@@ -80,8 +80,36 @@ function Card({ id, isDragging, image_url }) {
     opacity: isDragging ? 0.8 : 1,
   };
 
+  const removeButtonStyle = {
+    position: 'absolute',
+    top: '4px',
+    right: '4px',
+    backgroundColor: 'rgba(255, 77, 79, 0.8)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    width: '20px',
+    height: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    fontSize: '12px',
+    fontWeight: 'bold',
+    zIndex: 100,
+  };
+
   return (
     <div ref={setNodeRef} style={style}>
+      {/* Add the X button */}
+      <button
+        onClick={() => removeCard(id)}
+        style={removeButtonStyle}
+        aria-label="Remove card"
+        onMouseDown={(e) => e.stopPropagation()} // Prevent drag when clicking remove button
+      >
+        ×
+      </button>
 
       {/* Rest of card content */}
       <div 

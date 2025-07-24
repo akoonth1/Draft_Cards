@@ -210,6 +210,15 @@ export function CardProvider({ children }) {
     console.log(`Cleared all cards from ${columnId}`);
   };
 
+  const removeCard = useCallback((cardId) => {
+    setColumns(prevColumns =>
+      prevColumns.map(col => ({
+        ...col,
+        cards: col.cards.filter(card => card.id !== cardId)
+      }))
+    );
+  }, []);
+
   return (
     <CardContext.Provider
       value={{
@@ -219,8 +228,9 @@ export function CardProvider({ children }) {
         addColumn,
         getCardById,
         clearColumn,
-        updateCardPoints, // Added here
-        removeColumn, // Add removeColumn to the context value
+        updateCardPoints,
+        removeColumn,
+        removeCard // Add the new function here
       }}
     >
       {children}
