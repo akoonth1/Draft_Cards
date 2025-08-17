@@ -24,6 +24,9 @@ function App() {
       <div>
         {/* <FormInfo /> */}
       </div>
+        <div>
+        <SearchAnime />
+      </div>
       <div>
         <GrabImage />
        </div>
