@@ -58,7 +58,7 @@ function FormInfo({ id }) {
               width: '100%',
               padding: '4px 8px',
               borderRadius: '4px',
-              border: '1px solid #ccc',
+              border: '1px solid #772424ff',
               minHeight: '60px',
               resize: 'vertical'
             }}

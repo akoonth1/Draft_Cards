@@ -112,13 +112,13 @@ export default function GrabImage() {
       const response = await axios.get(`https://api.jikan.moe/v4/anime/${selectedAnime.id}/characters`);
       
       // Option 1: Filter by character names (current logic)
-      const filteredCharacters = response.data.data.filter((character) => {
-        const characterName = normalizeName(character.character.name);
-        return allCharacterNames.includes(characterName);
-      });
+      // const filteredCharacters = response.data.data.filter((character) => {
+      //   const characterName = normalizeName(character.character.name);
+      //   return allCharacterNames.includes(characterName);
+      // });
 
       // Option 2: Get all characters (uncomment to use all characters instead)
-      // const filteredCharacters = response.data.data;
+      const filteredCharacters = response.data.data;
 
       // Transform data to only include relevant fields
       const processedCharacters = filteredCharacters.map((character) => ({
@@ -267,7 +267,7 @@ const resultsContainerStyle = {
   padding: '10px',
   border: '1px solid #ddd',
   borderRadius: '4px',
-  backgroundColor: '#f9f9f9',
+  backgroundColor: '#5c1616ff',
 };
 
 const resultsListStyle = {
@@ -282,7 +282,7 @@ const resultItemStyle = {
   borderBottom: '1px solid #eee',
   transition: 'background-color 0.2s',
   ':hover': {
-    backgroundColor: '#e9e9e9',
+    backgroundColor: '#301a1aff',
   }
 };
 
