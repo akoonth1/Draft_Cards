@@ -63,7 +63,7 @@ export default function GetAnimeNameList() {
   );
 }
 
-// Optional: Add some basic styling
+
 const buttonStyle = {
   padding: '8px 16px',
   marginBottom: '20px',

@@ -99,7 +99,7 @@ function FormInfo({ id }) {
             padding: '4px 8px',
             minHeight: '24px',
             cursor: 'pointer',
-            color: '#fff'
+            color: '#88b917ff'
           }}
         >
           {cardData?.info || 'Click to add info...'}

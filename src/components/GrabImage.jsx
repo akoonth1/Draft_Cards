@@ -250,7 +250,7 @@ const inputStyle = {
   padding: '8px',
   fontSize: '16px',
   borderRadius: '4px 0 0 4px',
-  border: '1px solid #ccc',
+  border: '1px solid #d1d1d1a5',
 };
 
 const buttonStyle = {
@@ -265,7 +265,7 @@ const buttonStyle = {
 const resultsContainerStyle = {
   marginBottom: '20px',
   padding: '10px',
-  border: '1px solid #ddd',
+  border: '1px solid #ffffffff',
   borderRadius: '4px',
   backgroundColor: '#5c1616ff',
 };
@@ -279,7 +279,7 @@ const resultsListStyle = {
 const resultItemStyle = {
   padding: '10px',
   cursor: 'pointer',
-  borderBottom: '1px solid #eee',
+  borderBottom: '1px solid #151463ff',
   transition: 'background-color 0.2s',
   ':hover': {
     backgroundColor: '#301a1aff',
@@ -289,7 +289,7 @@ const resultItemStyle = {
 const selectedAnimeStyle = {
   marginBottom: '20px',
   padding: '15px',
-  backgroundColor: '#f5f5f5',
+  backgroundColor: '#351a76ff',
   borderRadius: '4px',
 };
 
