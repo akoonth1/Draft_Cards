@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { useCardContext } from './CardContext';
 
 function Card({ id, isDragging, image_url }) {
-  const { getCardById, updateCardPoints } = useCardContext();
+  const { getCardById, updateCardPoints, removeCard } = useCardContext();
   const cardData = getCardById(id) || {};
   const [tempPoints, setTempPoints] = useState(cardData.points || 0);
   const [showPoints, setShowPoints] = useState(true);
@@ -80,8 +80,42 @@ function Card({ id, isDragging, image_url }) {
     opacity: isDragging ? 0.8 : 1,
   };
 
+  const removeButtonStyle = {
+    position: 'absolute',
+    top: '4px',
+    right: '4px',
+    backgroundColor: 'rgba(255,77,79,0.9)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    width: '22px',
+    height: '22px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: 200,
+    fontSize: '14px',
+    lineHeight: 1,
+  };
+
   return (
     <div ref={setNodeRef} style={style}>
+
+      {/* Remove card button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          removeCard && removeCard(id);
+        }}
+        onMouseDown={(e) => e.stopPropagation()} // prevent drag start
+        onTouchStart={(e) => e.stopPropagation()}
+        style={removeButtonStyle}
+        aria-label="Remove card"
+        title="Remove card"
+      >
+        ×
+      </button>
 
       {/* Rest of card content */}
       <div 
@@ -157,7 +191,7 @@ function Card({ id, isDragging, image_url }) {
                 onTouchStart={(e) => e.stopPropagation()}
               />
             ) : (
-              <span>{tempPoints}</span> // Display tempPoints, not cardData.points
+              <span>{tempPoints}</span>
             )}
             <button
               onClick={incrementPoints}
@@ -173,7 +207,6 @@ function Card({ id, isDragging, image_url }) {
               }}
             >
               +
-              
             </button>
           </div>
         )}
