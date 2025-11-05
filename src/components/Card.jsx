@@ -68,8 +68,8 @@ function Card({ id, isDragging, image_url }) {
     backgroundImage: `url(${image_url || cardData.image_url})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    width: '120px',
-    height: '200px',
+    width: '200px', // increased 10%
+    height: '220px', // increased 10%
     padding: '0px',
     margin: '0 0 0px 0',
     backgroundColor: 'white',
@@ -85,7 +85,7 @@ function Card({ id, isDragging, image_url }) {
     top: '4px',
     right: '4px',
     backgroundColor: 'rgba(255,77,79,0.9)',
-    color: 'white',
+    color: '#ccc',
     border: 'none',
     borderRadius: '50%',
     width: '22px',
@@ -98,7 +98,7 @@ function Card({ id, isDragging, image_url }) {
     fontSize: '14px',
     lineHeight: 1,
   };
-
+  
   return (
     <div ref={setNodeRef} style={style}>
 
@@ -139,7 +139,7 @@ function Card({ id, isDragging, image_url }) {
               top: '8px',
               right: '8px',
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              color: 'white',
+              color: '#ccc',
               padding: '4px 8px',
               borderRadius: '12px',
               fontSize: '10px',
@@ -163,14 +163,14 @@ function Card({ id, isDragging, image_url }) {
                 marginRight: '4px',
                 backgroundColor: 'transparent',
                 border: 'none',
-                color: 'white',
+                color: '#ccc',
                 fontSize: '10px',
                 cursor: 'pointer',
               }}
             >
               -
             </button>
-
+ 
             {isEditingPoints ? (
               <input
                 type="text"
@@ -184,7 +184,7 @@ function Card({ id, isDragging, image_url }) {
                   border: 'none',
                   outline: 'none',
                   backgroundColor: 'transparent',
-                  color: 'white',
+                  color: '#ccc',
                   fontWeight: 'bold',
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
@@ -201,7 +201,7 @@ function Card({ id, isDragging, image_url }) {
                 marginLeft: '4px',
                 backgroundColor: 'transparent',
                 border: 'none',
-                color: 'white',
+                color: '#ccc',
                 fontSize: '10px',
                 cursor: 'pointer',
               }}
@@ -228,21 +228,21 @@ function Card({ id, isDragging, image_url }) {
       />
         {/* Information at the Bottom Center */}
         <div style={{
-          padding: '0px',
-          backgroundColor: 'rgba(15, 15, 32, 0.6)',
-          borderRadius: '10px',
-          position: 'absolute',
-          bottom: '0',
-          width: '100%',
-          color: 'white',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: '12px',
-      
-        }}>
-          <h3 style={{ margin: '8px 0' }}>{cardData.title || 'Untitled'}</h3>
-        </div>
+           padding: '0px',
+           backgroundColor: 'rgba(15, 15, 32, 0.6)',
+           borderRadius: '10px',
+           position: 'absolute',
+           bottom: '0',
+           width: '100%',
+           color: '#ccc',
+           display: 'flex',
+           justifyContent: 'center',
+           alignItems: 'center',
+           fontSize: '12px',
+       
+         }}>
+           <h3 style={{ margin: '8px 0' }}>{cardData.title || 'Untitled'}</h3>
+         </div>
       </div>
     </div>
   );
